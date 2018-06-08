@@ -1,0 +1,19 @@
+{
+  "name": "ttb-node-picture-picker",
+  "version": "0.1.0",
+  "description": "This node allows the user to choose a picture.",
+  "node-red": {
+      "nodes": {
+        "picture-picker":"picture-picker.js"
+      }
+  },
+  "main": "picture-picker.js",
+  "keywords": [
+    "picture",
+    "image",
+    "thethingbox",
+    "Node-RED"
+  ],
+  "author": "digitalairways.com",
+  "license": "http://www.wtfpl.net"
+}

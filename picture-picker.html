@@ -1,0 +1,109 @@
+<script type="text/x-red" data-template-name="picturepicker">
+  <div class="form-row" id = "gallery" style = "display:block;width:500px;margin-left: auto;margin-right: auto;">
+    <!-- Gallery -->
+    <!-- Dynamically filled by ajax request in oneditprepare function-->
+  </div>
+  <div class="form-row" style = "margin-top: 15px;">
+    <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="Name">
+  </div>
+  <div style="cursor: pointer;" class="accordion-header ui-accordion-header ui-helper-reset ui-state-default ui-accordion-icons ui-corner-all" id="nset-advanced">
+    <span style="display: inline-block;">
+      <span class="ui-icon ui-icon-triangle-1-e" id="nset-advanced-arrow"></span>
+    </span>
+    <span>Advanced</span>
+  </div>
+  <div class="form-row" style="padding-top: 7px; padding-bottom: 7px; margin-top: -1px; border-left: 1px solid #d3d3d3; border-bottom: 1px solid #d3d3d3; border-right: 1px solid #d3d3d3; border-radius: 2px; display: none;" id="nset-advanced-form">
+    <span style="margin-left: 10px;">Picture : <input type="text" style="width:308px" id="node-input-picture"></span>
+  </div>
+</script>
+<script type="text/x-red" data-help-name="picturepicker">
+  <p>This node allows you to choose a .png/.jpg file among our preselected ones.</p>
+  <p>Pictures must be stored in this node, in the icons repertory.</p>
+  <p>The chosen picture is sent in msg.<b>picture</b>. This same attribute can be used to override the selected value.</p>
+  <p>If no picture is chosen, the LED Matrix only displays the text.</p>
+</script>
+<script type="text/javascript">
+  RED.nodes.registerType('picturepicker',{
+    category: 'basic',
+    defaults: {
+      name: {value:""},
+      picture: {value:""}
+    },
+    color: '#ffffff',
+    inputs:1,
+    outputs:1,
+    icon: "file.png",
+    paletteLabel: "picturepicker",
+    label: function() {
+      return this.name||"picturepicker";
+    },
+    labelStyle: function() {
+      return this.name?"node_label_italic":"";
+    }
+    ,oneditprepare: function() {
+      var picture = this.picture;
+      $.get("picture/list/", function(data, status){
+        if(data.length != 0){
+          for(var i= 0; i < data.length; i++)
+          {
+            var divPic = $('<div id = "' + data[i][1].split("/")[data[i][1].split("/").length-1].replace(".png","").replace(".gif","").replace(".jpg","") + '" class = "boxgrid" title = "' +  data[i][1] + '" style = "width:16px;height:16px;margin:5px;float:left;background:#161613;border: solid 3px white;overflow: hidden;position: relative;"></div>');
+            divPic.append('<img src=' + data[i][0] +'></img>');
+            $("#gallery").append(divPic);
+            divPic.click(function ()
+            {
+              $("#node-input-picture").val(this.title);
+
+              $(".boxgrid").css({'border': 'solid 3px white'});
+              $(this).css({'border' : 'solid 3px #fe0000'});
+            });
+            mouse = 0;
+            divPic.mouseover(function ()
+            {
+              $(this).css({'box-shadow' : '0px 0px 10px #fe0000'});
+            }).mouseout(function ()
+            {
+              if(mouse == 0)
+              {
+                $(this).css({'box-shadow' : 'none'});
+              }
+            });
+          }
+
+          // Memory selection
+          if(picture != ""){
+            var splitted_pic = picture.split("/")[picture.split("/").length - 1].replace(".png","").replace(".gif","").replace(".jpg","");
+            $("#" + splitted_pic).css({'border' : 'solid 3px #fe0000'});
+          }
+        }
+        else{
+          $("#gallery").html("No picture found. Give an image path in 'Advanced'");
+          var form = $("#nset-advanced-form");
+          var arrow = $("#nset-advanced-arrow");
+          form.css("display", "block");
+          arrow.removeClass("ui-icon-triangle-1-e");
+          arrow.addClass("ui-icon-triangle-1-s");
+        }
+      });
+
+      // Remove the memory selection when typing a URL manually
+      $("#node-input-picture").click(function(){
+        $(".boxgrid").css({'border': 'solid 3px white'});
+      });
+
+      $("#nset-advanced").click(function() {
+        var form = $("#nset-advanced-form");
+        var arrow = $("#nset-advanced-arrow");
+        if(form.css("display") == "none") {
+          form.css("display", "block");
+          arrow.removeClass("ui-icon-triangle-1-e");
+          arrow.addClass("ui-icon-triangle-1-s");
+        } else {
+          form.css("display", "none");
+          arrow.removeClass("ui-icon-triangle-1-s");
+          arrow.addClass("ui-icon-triangle-1-e");
+        }
+      });
+    }
+  });
+</script>
