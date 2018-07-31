@@ -1,6 +1,6 @@
 {
   "name": "ttb-node-picture-picker",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "This node allows the user to choose a picture.",
   "node-red": {
       "nodes": {
